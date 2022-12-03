@@ -81,6 +81,153 @@ typdefaultbin  |
 typdefault     |
 typacl         |
 
+### PostgreSql 中常用sql
+--查看数据库
+select * from pg_database;
 
+--查看表空间
+select * from pg_tablespace;
+
+--查看语言
+select * from pg_language;
+
+--查看角色用户
+select * from pg_user;
+select * from pg_shadow;
+select * from pg_roles;
+
+--查看会话进程
+select * from pg_stat_activity;
+
+--查看表
+SELECT * FROM pg_tables where schemaname = 'public';
+
+--查看表字段
+select * from information_schema.columns where table_schema = 'public' and table_name = 'pf_vip_org';
+
+--查看视图
+select * from pg_views where schemaname = 'public';
+select * from information_schema.views where table_schema = 'public';
+
+--查看触发器
+select * from information_schema.triggers;
+
+--查看序列
+select * from information_schema.sequences where sequence_schema = 'public';
+
+ --查看约束
+select * from pg_constraint where contype = 'p' 
+
+select * from pg_constraint where connamespace=2200 and conrelid=24826
+--u unique,p primary,f foreign,c check,t trigger,x exclusion
+
+select a.relname as table_name,b.conname as constraint_name,b.contype as constraint_type from pg_class a,pg_constraint b where a.oid = b.conrelid and a.relname = 'cc';
+
+--查看过程函数（包含触发器函数和函数）
+select oid,* from pg_proc where pronamespace=2200;
+
+--2200为public的oid
+
+ 
+
+--查看索引
+select * from pg_index ;
+
+--查看表上存在哪些索引以及大小
+select relname,n.amname as index_type from pg_class m,pg_am n where m.relam = n.oid and m.oid in (
+select b.indexrelid from pg_class a,pg_index b where a.oid = b.indrelid and a.relname = 'cc');
+
+SELECT c.relname,c2.relname, c2.relpages*8 as size_kb
+FROM pg_class c, pg_class c2, pg_index i
+WHERE c.relname = 'cc' AND
+c.oid = i.indrelid AND
+c2.oid = i.indexrelid
+ORDER BY c2.relname;
+
+--查看索引定义
+select b.indexrelid from pg_class a,pg_index b where a.oid = b.indrelid and a.relname = 'cc';
+select pg_get_indexdef(b.indexrelid);
+
+--查看过程函数定义
+select oid,* from pg_proc where proname = 'insert_platform_action_exist'; --oid = 24610
+select * from pg_get_functiondef(24610);
+
+--查看表大小(不含索引等信息)
+select pg_relation_size('cc');                         --368640 byte
+select pg_size_pretty(pg_relation_size('cc'))   --360 kB
+
+--查看DB大小
+select pg_size_pretty(pg_database_size('smiletao'));   --12M
+
+--查看服务器DB运行状态
+[postgres@eyar ~]$ pg_ctl status -D $PGDATA
+pg_ctl: server is running (PID: 2373)
+/home/postgres/bin/postgres "-D" "/database/pgdata"
+
+--查看每个DB的使用情况(读,写,缓存,更新,事务等)
+select * from pg_stat_database
+
+--查看索引的使用情况
+select * from pg_stat_user_indexes;
+
+--查看表所对应的数据文件路径与大小
+SELECT pg_relation_filepath(oid), relpages FROM pg_class WHERE relname = 'empsalary';
+
+--查看索引与相关字段及大小
+ SELECT n.nspname AS schema_name,
+        r.rolname as table_owner,
+       bc.relname AS table_name,
+       ic.relname AS index_name,
+       a.attname  AS column_name,
+       bc.relpages*8 as index_size_kb    
+  FROM pg_namespace n,
+       pg_class bc,             -- base class
+       pg_class ic,             -- index class
+       pg_index i,
+       pg_attribute a,           -- att in base
+       pg_roles r
+  WHERE bc.relnamespace = n.oid
+     and i.indrelid = bc.oid
+     and i.indexrelid = ic.oid
+     and bc.relowner = r.oid
+     and i.indkey[0] = a.attnum
+     and i.indnatts = 1
+     and a.attrelid = bc.oid
+     and n.nspname = 'public'
+     and bc.relname = 'cc'
+  ORDER BY schema_name, table_name, index_name, attname;
+
+--查看PG锁
+select * from pg_locks;
+
+备注：relpages*8 是实际所占磁盘大小
+
+--查看表空间大小
+select pg_tablespace_size('pg_default');
+
+--查看序列与表的对应关系
+  WITH fq_objects AS (SELECT c.oid,c.relname AS fqname ,
+                           c.relkind, c.relname AS relation
+                    FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace ),
+
+     sequences AS (SELECT oid,fqname FROM fq_objects WHERE relkind = 'S'),
+     tables    AS (SELECT oid, fqname FROM fq_objects WHERE relkind = 'r' )
+         SELECT
+       s.fqname AS sequence,
+       '->' as depends,
+       t.fqname AS table
+      FROM
+       pg_depend d JOIN sequences s ON s.oid = d.objid
+                 JOIN tables t ON t.oid = d.refobjid
+          WHERE
+       d.deptype = 'a' and t.fqname = 'cc';
+
+--数据库分页查询---
+
+select ctid,* from kakou_clxx limit 10 offset 10
+select ctid,* from kakou_clxx limit 10 offset 20
+————————————————
+版权声明：本文为CSDN博主「ganen_qian」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+原文链接：https://blog.csdn.net/nihaoma71121/article/details/8954426
 
 
