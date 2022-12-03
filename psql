@@ -4,3 +4,83 @@
     # \x
     Expanded display is off.(扩展显示已关闭.)
 
++ 单词含义
+d -- display
+
+
++ 命令含义
+\du （查看角色）
+\l （列出所有数据库）
+\q （退出）
+\df (查看function) 函数
+
+
++ pg_proc表
+oid             | 1242
+proname         |函数名称 e.g. boolin
+pronamespace    | 11
+proowner        | 10
+prolang         | 12
+procost         | 1
+prorows         | 0
+provariadic     | 0
+prosupport      | -
+prokind         | f
+prosecdef       | f
+proleakproof    | f
+proisstrict     | t
+proretset       | f
+provolatile     | i
+proparallel     | s
+pronargs        |参数个数 e.g. 1
+pronargdefaults | 0
+prorettype      | [pg_type表]的[oid] 关联 e.g. 16
+proargtypes     | 2275
+proallargtypes  |
+proargmodes     |
+proargnames     |
+proargdefaults  |
+protrftypes     |
+prosrc          | boolin
+probin          |
+prosqlbody      |
+proconfig       |
+proacl          |
+
++ pg_type表
+oid            | 16
+typname        |返回值数据类型 e.g. bool
+typnamespace   | 11
+typowner       | 10
+typlen         | 1
+typbyval       | t
+typtype        | b
+typcategory    | B
+typispreferred | t
+typisdefined   | t
+typdelim       | ,
+typrelid       | 0
+typsubscript   | -
+typelem        | 0
+typarray       | 1000
+typinput       | boolin
+typoutput      | boolout
+typreceive     | boolrecv
+typsend        | boolsend
+typmodin       | -
+typmodout      | -
+typanalyze     | -
+typalign       | c
+typstorage     | p
+typnotnull     | f
+typbasetype    | 0
+typtypmod      | -1
+typndims       | 0
+typcollation   | 0
+typdefaultbin  |
+typdefault     |
+typacl         |
+
+
+
+
