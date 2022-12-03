@@ -1,0 +1,6 @@
++ psql竖式输出查询结果
+    # \x
+    Expanded display is on.(扩展显示已打开.)
+    # \x
+    Expanded display is off.(扩展显示已关闭.)
+
